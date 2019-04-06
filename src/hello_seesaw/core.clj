@@ -11,7 +11,7 @@
 (defn crearPreguntaEscala [])
 (defn crearPreguntaUnica [])
 
-(defn crearPreguntaUnica []
+(defn crearPreguntaUnica [nombreEncuesta listaEncuestas listaPreguntas]
   (let [inputCuerpoPregunta  (text :columns 20)
         valueInputCuerpoPregunta  (atom "")
         
@@ -33,26 +33,22 @@
                 "Agregar Opciones separadas por -"
                 inputOpcion
                 
-                ;(action :name "Agregar Opcion"
-                  ;:handler (fn [e] (cons @valueInputOpcion lista))
+                ;(action :name "Agregar Opcion")
+                  ;:handler (fn [e] (cons @valueInputOpcion lista)))
                 
                 :separator
                 (action :name "Agregar Pregunta"
-                  :handler (fn [e](invoke-later
-                                    (-> (tipoPregunta (cons @valueInputCuerpoPregunta (reverse (cons "tipo1" (reverse(list (split (str @valueInputOpcion)#"-")))))))
-                                        pack!
-                                        show!))))                
-                
-                (action :name "Volver"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (tipoPregunta)
+                                                             (-> (tipoPregunta nombreEncuesta listaEncuestas (cons (cons @valueInputCuerpoPregunta (reverse (cons "tipo1" (reverse(list (split (str @valueInputOpcion)#"-")))))) listaPreguntas))
                                                                  pack!
-                                                                 show!))))])
+                                                                 show!))))])                
+                
+                
       
       
       :on-close :exit)))
 
-(defn crearPreguntaEscala []
+(defn crearPreguntaEscala [nombreEncuesta listaEncuestas listaPreguntas]
   (let [inputCuerpoPregunta  (text :columns 20)
         valueInputCuerpoPregunta  (atom "")
         
@@ -79,33 +75,39 @@
                 
                 :separator
                 (action :name "Agregar Pregunta"
-                  :handler (fn [e] (println "Pregunta" @valueInputCuerpoPregunta "Opciones" (cons @valueInputCuerpoPregunta (reverse (cons "tipo2" (reverse (list (split (str @valueInputOpcion)#"-")))))))))                
-                
-                (action :name "Volver"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (tipoPregunta)
+                                                             (-> (tipoPregunta nombreEncuesta listaEncuestas (cons (cons @valueInputCuerpoPregunta (reverse (cons "tipo2" (reverse(list (split (str @valueInputOpcion)#"-")))))) listaPreguntas))
                                                                  pack!
-                                                                 show!))))])
+                                                                 show!))))])   
+                
       
       
       :on-close :exit)))
 
 
-(defn crearEncuesta []
-  (let [input  (text :columns 20)]
- 
+(defn crearEncuesta [listaEncuestas]
+  (let [inputNombreEncuesta  (text :columns 20)
+        valueNombreEncuesta  (atom "")]
+        
+    (bind/bind inputNombreEncuesta valueNombreEncuesta)
     
     (frame 
       :content 
       (vertical-panel 
         :border 5
-        :items ["Digite el cuerpo de la pregunta:"
+        :items ["Digite el nombre de la encuesta:"
+                inputNombreEncuesta
                 
+                (action :name "Crear Preguntas"
+                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                             (-> (tipoPregunta @valueNombreEncuesta listaEncuestas '())
+                                                                 pack!
+                                                                 show!))))
                 (action :name "Volver"
-                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (mainForm)
-                                                                pack!
-                                                                show!))))])
+                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                             (-> (mainForm)
+                                                                 pack!
+                                                                 show!))))])
       :on-close :exit)))
 
 (defn responderEncuesta []
@@ -140,8 +142,8 @@
                                                                 show!))))])
       :on-close :exit)))
 
-(defn tipoPregunta []
-  (let [input  (text :columns 20)]
+(defn tipoPregunta [nombreEncuesta listaEncuestas listaPreguntas]
+  (let []
     (frame 
       :content 
       (vertical-panel 
@@ -150,22 +152,24 @@
                 
                 (action :name "Seleccion Unica"
                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (crearPreguntaUnica)
+                                                            (-> (crearPreguntaUnica nombreEncuesta listaEncuestas listaPreguntas)
                                                                 pack!
                                                                 show!))))
                 (action :name "Escala"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (crearPreguntaEscala)
+                                                             (-> (crearPreguntaEscala nombreEncuesta listaEncuestas listaPreguntas)
                                                                  pack!
                                                                  show!))))
-                (action :name "Volver"
+                (action :name "Imprimir"
+                  :handler (fn [e] (println "lista: " listaPreguntas)))
+                (action :name "Listo"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (mainForm)
+                                                             (-> (mainForm listaEncuestas)
                                                                  pack!
                                                                  show!))))])
       :on-close :exit)))
 
-(defn mainForm []
+(defn mainForm [listaEncuestas]
   (let []
     (frame 
       :content 
@@ -173,32 +177,27 @@
         :border 5
         :items ["Que desea hacer:" 
                 
-                (action :name "Crear Preguntas"
-                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (tipoPregunta)
-                                                                 pack!
-                                                                 show!))))
                 (action :name "Crear Encuestas"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (crearEncuesta)
+                                                             (-> (crearEncuesta listaEncuestas)
                                                                  pack!
                                                                  show!))))
                 (action :name "Responder Encuestas"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
                                                              (-> (responderEncuesta)
                                                                  pack!
-                                                                 show!))))
-                (action :name "Estadisticas"
-                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (estadistica)
-                                                                 pack!
                                                                  show!))))])
+                ;(action :name "Estadisticas"
+                 ; :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                  ;                                           (-> (estadistica)
+                   ;                                              pack!
+                    ;                                             show!))))])
       :on-close :exit)))
 
 
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm)
+    (-> (mainForm '())
      pack!
      show!)))
