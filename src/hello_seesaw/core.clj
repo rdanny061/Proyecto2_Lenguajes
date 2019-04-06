@@ -110,10 +110,8 @@
                                                                  show!))))])
       :on-close :exit)))
 
-(defn responderEncuesta []
+(defn responderEncuesta [listaEncuestas]
   (let [input  (text :columns 20)]
- 
-    
     (frame 
       :content 
       (vertical-panel 
@@ -121,10 +119,10 @@
         :items ["Digite el cuerpo de la pregunta:"
                 
                 (action :name "Volver"
-                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (mainForm)
-                                                                pack!
-                                                                show!))))])
+                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                             (-> (mainForm listaEncuestas)
+                                                                 pack!
+                                                                 show!))))])
       :on-close :exit)))
 
 (defn estadistica []
@@ -184,7 +182,7 @@
                                                                  show!))))
                 (action :name "Responder Encuestas"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (responderEncuesta)
+                                                             (-> (responderEncuesta listaEncuestas)
                                                                  pack!
                                                                  show!))))
                 (action :name "Imprimir"
