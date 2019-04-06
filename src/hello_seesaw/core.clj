@@ -41,7 +41,7 @@
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
                                                              (-> (tipoPregunta nombreEncuesta listaEncuestas (cons (cons @valueInputCuerpoPregunta (reverse (cons "tipo1" (reverse(list (split (str @valueInputOpcion)#"-")))))) listaPreguntas))
                                                                  pack!
-                                                                 show!))))])                
+                                                                   show!))))])                
                 
                 
       
@@ -164,7 +164,7 @@
                   :handler (fn [e] (println "lista: " listaPreguntas)))
                 (action :name "Listo"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (mainForm listaEncuestas)
+                                                             (-> (mainForm (cons (cons nombreEncuesta (list listaPreguntas)) listaEncuestas))
                                                                  pack!
                                                                  show!))))])
       :on-close :exit)))
@@ -186,7 +186,9 @@
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
                                                              (-> (responderEncuesta)
                                                                  pack!
-                                                                 show!))))])
+                                                                 show!))))
+                (action :name "Imprimir"
+                  :handler (fn [e] (println "lista: " listaEncuestas)))])
                 ;(action :name "Estadisticas"
                  ; :handler (fn [e] (dispose! (all-frames)) (invoke-later
                   ;                                           (-> (estadistica)
