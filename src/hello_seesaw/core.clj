@@ -111,20 +111,24 @@
       :on-close :exit)))
 
 (defn responderEncuesta [listaEncuestas]
-  (let [input  (text :columns 20)]
+  (let [input  (text :columns 20)
+        value  (atom "")]
+    (bind/bind input value)
     (frame 
       :content 
-      (vertical-panel 
-        :border 5
-        :items ["Digite el cuerpo de la pregunta:"
-                
-                (action :name "Volver"
-                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (mainForm listaEncuestas)
-                                                                 pack!
-                                                                 show!))))])
-      :on-close :exit)))
-
+   
+      (form-panel 
+        :items [
+                [(grid-panel 
+                   :columns 1
+                   :items (map #(label :text %) ["danny" "rojas"]))
+                 :grid 
+                 :next 
+                 :gridheight 5 
+                 :anchor 
+                 :north 
+                 :weightx 0]]))))
+  
 (defn estadistica []
   (let [input  (text :columns 20)]
     (frame 
