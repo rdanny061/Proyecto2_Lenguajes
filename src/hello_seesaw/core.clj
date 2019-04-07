@@ -10,6 +10,7 @@
 (defn crearEncuesta [])
 (defn crearPreguntaEscala [])
 (defn crearPreguntaUnica [])
+(defn respondiendoEncuesta[])
 
 (defn crearPreguntaUnica [nombreEncuesta listaEncuestas listaPreguntas]
   (let [inputCuerpoPregunta  (text :columns 20)
@@ -42,10 +43,6 @@
                                                              (-> (tipoPregunta nombreEncuesta listaEncuestas (cons (cons @valueInputCuerpoPregunta (reverse (cons "tipo1" (reverse(list (split (str @valueInputOpcion)#"-")))))) listaPreguntas))
                                                                  pack!
                                                                    show!))))])                
-                
-                
-      
-      
       :on-close :exit)))
 
 (defn crearPreguntaEscala [nombreEncuesta listaEncuestas listaPreguntas]
@@ -112,22 +109,42 @@
 
 (defn responderEncuesta [listaEncuestas]
   (let [input  (text :columns 20)
-        value  (atom "")]
+        value  (atom "")
+        combo (combobox :model (map #(first %) listaEncuestas))
+        valueCombo (atom "")]        
     (bind/bind input value)
     (frame 
       :content 
    
-      (form-panel 
+      (vertical-panel 
         :items [
-                [(grid-panel 
-                   :columns 1
-                   :items (map #(label :text %) ["danny" "rojas"]))
-                 :grid 
-                 :next 
-                 :gridheight 5 
-                 :anchor 
-                 :north 
-                 :weightx 0]]))))
+                combo
+                (action :name "Imprimir valor combo"
+                  :handler (fn [e] (println "Valor combo" (selection combo))))
+                (action :name "Seleccionar"
+                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                            (-> (respondiendoEncuesta listaEncuestas (first(filter 
+                                                                                                             #(= (first %) (selection combo))
+                                                                                                             listaEncuestas)))
+                                                                
+                                                                pack!
+                                                                show!))))]))))
+
+(defn respondiendoEncuesta [listaEncuestas encuesta]
+  (let [input  (text :columns 20)]
+    (frame 
+      :content 
+      (vertical-panel 
+        :border 5
+        :items ["Respondiendo encuestas"
+                (action :name "Imprimir"
+                  :handler (fn [e] (println "Encuesta: " encuesta)))
+                (action :name "Volver"
+                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                            (-> (mainForm listaEncuestas)
+                                                                pack!
+                                                                show!))))])
+      :on-close :exit)))
   
 (defn estadistica []
   (let [input  (text :columns 20)]
@@ -202,6 +219,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '())
+    (-> (mainForm '(("enc3" ()) ("enc2" ()) ("enc1" ())))
      pack!
      show!)))
