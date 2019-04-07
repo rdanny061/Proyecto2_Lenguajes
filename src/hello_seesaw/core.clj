@@ -123,14 +123,12 @@
                   :handler (fn [e] (println "Valor combo" (selection combo))))
                 (action :name "Seleccionar"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (respondiendoEncuesta listaEncuestas (first(filter 
-                                                                                                             #(= (first %) (selection combo))
-                                                                                                             listaEncuestas)))
+                                                            (-> (respondiendoEncuesta listaEncuestas (first(first(filter #(= (first %) (selection combo)) listaEncuestas))) (rest(first(filter #(= (first %) (selection combo)) listaEncuestas))))
                                                                 
                                                                 pack!
                                                                 show!))))]))))
 
-(defn respondiendoEncuesta [listaEncuestas encuesta]
+(defn respondiendoEncuesta [listaEncuestas nombreEncuesta listaPreguntas]
   (let [input  (text :columns 20)]
     (frame 
       :content 
@@ -138,7 +136,7 @@
         :border 5
         :items ["Respondiendo encuestas"
                 (action :name "Imprimir"
-                  :handler (fn [e] (println "Encuesta: " encuesta)))
+                  :handler (fn [e] (println "Encuesta: " nombreEncuesta "lista preguntas: " listaPreguntas)))
                 (action :name "Volver"
                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
                                                             (-> (mainForm listaEncuestas)
@@ -219,6 +217,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" ()) ("enc2" ()) ("enc1" ())))
+    (-> (mainForm '(("enc3" ("tengo preguntas")) ("enc2" ("yo tambien")) ("enc1" ("y yo"))))
      pack!
      show!)))
