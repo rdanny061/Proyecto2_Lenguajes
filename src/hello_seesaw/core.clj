@@ -122,18 +122,20 @@
                 
                 (action :name "Siguiente"
                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) (cons (first (first listaPreguntas2)) (list (selection combo))) contador)
+                                                            (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) (cons (cons (first (first listaPreguntas2)) (list (selection combo))) listaRespuestas) contador)
                                                                 pack!
                                                                 show!))))])
       :on-close :exit)))
 (defn preguntaTipo2 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador]
-  (let [input  (text :columns 20)]
+  (let [input  (text :columns 20)
+        combo (combobox :model (first(rest (first listaPreguntas2))))]
     (frame 
       :content 
       (vertical-panel 
         :border 5
         :items ["Tipo2"
-                
+                (str (first (first listaPreguntas2)))
+                (str (rest (first listaPreguntas2))) 
                 (action :name "Volver"
                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
                                                             (-> (mainForm)
@@ -168,7 +170,7 @@
 
   (cond
     (= contador 0) (invoke-later
-                     (-> (estadistica)
+                     (-> (estadistica listaEncuestas listaRespuestas)
                          pack!
                          show!))
     (not(empty? listaPreguntas2)) (cond
@@ -192,7 +194,7 @@
     
     
   
-(defn estadistica []
+(defn estadistica [listaEncuestas listaRespuestas]
   (let [input  (text :columns 20)]
     (frame 
       :content 
@@ -201,10 +203,7 @@
         :items ["Digite el cuerpo de la pregunta:"
                 
                 (action :name "Volver"
-                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (mainForm)
-                                                                pack!
-                                                                show!))))])
+                 :handler (fn [e] (println listaRespuestas)))])
       :on-close :exit)))
 
 (defn tipoPregunta [nombreEncuesta listaEncuestas listaPreguntas]
@@ -265,6 +264,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo1") ("pregunta2" ("si" "no") "tipo1") ("pregunta3" ("si" "no") "tipo1"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
+    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo1") ("pregunta2" ("si" "no") "tipo1") ("pregunta3" ("si" "no" "tal vez") "tipo1"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
      pack!
      show!)))
