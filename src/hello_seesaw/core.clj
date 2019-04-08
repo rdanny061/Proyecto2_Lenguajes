@@ -10,7 +10,7 @@
 (defn crearEncuesta [])
 (defn crearPreguntaEscala [])
 (defn crearPreguntaUnica [])
-(defn respondiendoEncuesta[])
+(defn validacionTipo[])
 
 (defn crearPreguntaUnica [nombreEncuesta listaEncuestas listaPreguntas]
   (let [inputCuerpoPregunta  (text :columns 20)
@@ -106,43 +106,70 @@
                                                                  pack!
                                                                  show!))))])
       :on-close :exit)))
+(defn preguntaTipo1 []
+  (let [input  (text :columns 20)]
+    (frame 
+      :content 
+      (vertical-panel 
+        :border 5
+        :items ["Tipo1"
+                
+                (action :name "Volver"
+                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                            (-> (mainForm)
+                                                                pack!
+                                                                show!))))])
+      :on-close :exit)))
+(defn preguntaTipo2 []
+  (let [input  (text :columns 20)]
+    (frame 
+      :content 
+      (vertical-panel 
+        :border 5
+        :items ["Tipo2"
+                
+                (action :name "Volver"
+                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                            (-> (mainForm)
+                                                                pack!
+                                                                show!))))])
+      :on-close :exit)))
 
 (defn responderEncuesta [listaEncuestas]
-  (let [input  (text :columns 20)
-        value  (atom "")
+  (let [inputContador  (text :columns 20)
+        valueContador  (atom "")
         combo (combobox :model (map #(first %) listaEncuestas))
         valueCombo (atom "")]        
-    (bind/bind input value)
+    (bind/bind inputContador valueContador)
     (frame 
       :content 
    
       (vertical-panel 
         :items [
                 combo
+                "Cuantas veces desea contestar la encuesta"
+                inputContador
                 (action :name "Imprimir valor combo"
-                  :handler (fn [e] (println "Valor combo" (selection combo))))
+                  :handler (fn [e] (println "Valor combo: " (selection combo) "Cantidad veces: " @valueContador "nombre encuesta: " (first(first(filter #(= (first %) (selection combo)) listaEncuestas))) "lista preguntas: " (first(rest(first(filter #(= (first %) (selection combo)) listaEncuestas)))))))
                 (action :name "Seleccionar"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (respondiendoEncuesta listaEncuestas (first(first(filter #(= (first %) (selection combo)) listaEncuestas))) (rest(first(filter #(= (first %) (selection combo)) listaEncuestas))))
+                                                            (-> (validacionTipo listaEncuestas (first(first(filter #(= (first %) (selection combo)) listaEncuestas))) (first(rest(first(filter #(= (first %) (selection combo)) listaEncuestas)))) '())
                                                                 
                                                                 pack!
                                                                 show!))))]))))
 
-(defn respondiendoEncuesta [listaEncuestas nombreEncuesta listaPreguntas]
-  (let [input  (text :columns 20)]
-    (frame 
-      :content 
-      (vertical-panel 
-        :border 5
-        :items ["Respondiendo encuestas"
-                (action :name "Imprimir"
-                  :handler (fn [e] (println "Encuesta: " nombreEncuesta "lista preguntas: " listaPreguntas)))
-                (action :name "Volver"
-                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (mainForm listaEncuestas)
-                                                                pack!
-                                                                show!))))])
-      :on-close :exit)))
+(defn validacionTipo [listaEncuestas nombreEncuesta listaPreguntas listaRespuestas]
+
+  (cond
+    (= (str (first (reverse (first listaPreguntas)))) "tipo1") (invoke-later
+                                                                 (-> (preguntaTipo1)
+                                                                     pack!
+                                                                     show!))
+    (= (str (first (reverse (first listaPreguntas)))) "tipo2") (invoke-later
+                                                                 (-> (preguntaTipo2)
+                                                                     pack!
+                                                                     show!))))
+    
   
 (defn estadistica []
   (let [input  (text :columns 20)]
@@ -217,6 +244,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" ("tengo preguntas")) ("enc2" ("yo tambien")) ("enc1" ("y yo"))))
+    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo2"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
      pack!
      show!)))
