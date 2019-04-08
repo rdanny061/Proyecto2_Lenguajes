@@ -13,6 +13,7 @@
 (defn validacionTipo[])
 (defn preguntaTipo1 [])
 (defn preguntaTipo2 [])
+(defn preguntaTipo2Frame [])
 
 (defn crearPreguntaUnica [nombreEncuesta listaEncuestas listaPreguntas]
   (let [inputCuerpoPregunta  (text :columns 20)
@@ -126,22 +127,34 @@
                                                                 pack!
                                                                 show!))))])
       :on-close :exit)))
-(defn preguntaTipo2 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador]
+(defn preguntaTipo2Frame [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems]
   (let [input  (text :columns 20)
-        combo (combobox :model (first(rest (first listaPreguntas2))))]
+        combo (combobox :model ["Muy bien" "Bien" "Regular" "Malo" "Muy malo"])]
     (frame 
       :content 
       (vertical-panel 
         :border 5
         :items ["Tipo2"
                 (str (first (first listaPreguntas2)))
-                (str (rest (first listaPreguntas2))) 
-                (action :name "Volver"
-                 :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (mainForm)
-                                                                pack!
-                                                                show!))))])
+                (str (first listaItems))
+                combo
+                (action :name "Siguiente"
+                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                             (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador (rest listaItems))
+                                                                 pack!
+                                                                 show!))))])
       :on-close :exit)))
+
+(defn preguntaTipo2 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems]
+  (cond
+    (not(empty? listaItems)) (invoke-later
+                               (-> (preguntaTipo2Frame listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems)
+                                   pack!
+                                   show!)) 
+    (empty? listaItems) (invoke-later
+                          (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) listaRespuestas contador)
+                              pack!
+                              show!))))
 
 (defn responderEncuesta [listaEncuestas]
   (let [inputContador  (text :columns 20)
@@ -179,7 +192,7 @@
                                                                                                       pack!
                                                                                                       show!))
                                     (= (str (first (reverse (first listaPreguntas2)))) "tipo2") (invoke-later
-                                                                                                  (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador) ;lista 2 es la que va a cambiar
+                                                                                                  (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador (first(rest (first listaPreguntas2)))) ;lista 2 es la que va a cambiar
                                                                                                       pack!
                                                                                                       show!)))
     (empty? listaPreguntas2) (invoke-later
@@ -264,6 +277,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo1") ("pregunta2" ("si" "no") "tipo1") ("pregunta3" ("si" "no" "tal vez") "tipo1"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
+    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo2") ("pregunta2" ("si" "no") "tipo2") ("pregunta3" ("si" "no" "tal vez") "tipo2"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
      pack!
      show!)))
