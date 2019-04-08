@@ -11,6 +11,8 @@
 (defn crearPreguntaEscala [])
 (defn crearPreguntaUnica [])
 (defn validacionTipo[])
+(defn preguntaTipo1 [])
+(defn preguntaTipo2 [])
 
 (defn crearPreguntaUnica [nombreEncuesta listaEncuestas listaPreguntas]
   (let [inputCuerpoPregunta  (text :columns 20)
@@ -106,21 +108,25 @@
                                                                  pack!
                                                                  show!))))])
       :on-close :exit)))
-(defn preguntaTipo1 []
-  (let [input  (text :columns 20)]
+(defn preguntaTipo1 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador]
+  (let [input  (text :columns 20)
+        combo (combobox :model (first(rest (first listaPreguntas2))))]
     (frame 
       :content 
       (vertical-panel 
         :border 5
         :items ["Tipo1"
+                (str (first (first listaPreguntas2)))
+                combo
                 
-                (action :name "Volver"
+                
+                (action :name "Siguiente"
                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (mainForm)
+                                                            (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) (cons (first (first listaPreguntas2)) (list (selection combo))) contador)
                                                                 pack!
                                                                 show!))))])
       :on-close :exit)))
-(defn preguntaTipo2 []
+(defn preguntaTipo2 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador]
   (let [input  (text :columns 20)]
     (frame 
       :content 
@@ -153,22 +159,37 @@
                   :handler (fn [e] (println "Valor combo: " (selection combo) "Cantidad veces: " @valueContador "nombre encuesta: " (first(first(filter #(= (first %) (selection combo)) listaEncuestas))) "lista preguntas: " (first(rest(first(filter #(= (first %) (selection combo)) listaEncuestas)))))))
                 (action :name "Seleccionar"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (validacionTipo listaEncuestas (first(first(filter #(= (first %) (selection combo)) listaEncuestas))) (first(rest(first(filter #(= (first %) (selection combo)) listaEncuestas)))) '())
+                                                            (-> (validacionTipo listaEncuestas (first(rest(first(filter #(= (first %) (selection combo)) listaEncuestas)))) (first(rest(first(filter #(= (first %) (selection combo)) listaEncuestas)))) '() (Integer. (str @valueContador)))
                                                                 
                                                                 pack!
                                                                 show!))))]))))
 
-(defn validacionTipo [listaEncuestas nombreEncuesta listaPreguntas listaRespuestas]
+(defn validacionTipo [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador]
 
   (cond
-    (= (str (first (reverse (first listaPreguntas)))) "tipo1") (invoke-later
-                                                                 (-> (preguntaTipo1)
-                                                                     pack!
-                                                                     show!))
-    (= (str (first (reverse (first listaPreguntas)))) "tipo2") (invoke-later
-                                                                 (-> (preguntaTipo2)
-                                                                     pack!
-                                                                     show!))))
+    (= contador 0) (invoke-later
+                     (-> (estadistica)
+                         pack!
+                         show!))
+    (not(empty? listaPreguntas2)) (cond
+                                    (= (str (first (reverse (first listaPreguntas2)))) "tipo1") (invoke-later
+                                                                                                  (-> (preguntaTipo1 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador) ;lista 2 es la que va a cambiar
+                                                                                                      pack!
+                                                                                                      show!))
+                                    (= (str (first (reverse (first listaPreguntas2)))) "tipo2") (invoke-later
+                                                                                                  (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador) ;lista 2 es la que va a cambiar
+                                                                                                      pack!
+                                                                                                      show!)))
+    (empty? listaPreguntas2) (invoke-later
+                               (-> (validacionTipo listaEncuestas listaPreguntas1 listaPreguntas1 listaRespuestas (- contador 1))
+                                   pack!
+                                   show!))))
+    
+    
+    ;se necesita que la preguntaTipo# llame con rest
+    
+    
+    
     
   
 (defn estadistica []
@@ -244,6 +265,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo2"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
+    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo1") ("pregunta2" ("si" "no") "tipo1") ("pregunta3" ("si" "no") "tipo1"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
      pack!
      show!)))
