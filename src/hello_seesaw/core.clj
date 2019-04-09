@@ -79,9 +79,6 @@
                                                              (-> (tipoPregunta nombreEncuesta listaEncuestas (cons (cons @valueInputCuerpoPregunta (reverse (cons "tipo2" (reverse(list (split (str @valueInputOpcion)#"-")))))) listaPreguntas))
                                                                  pack!
                                                                  show!))))])   
-                
-      
-      
       :on-close :exit)))
 
 
@@ -123,11 +120,11 @@
                 
                 (action :name "Siguiente"
                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                            (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) (cons (cons (first (first listaPreguntas2)) (list (selection combo))) listaRespuestas) contador)
+                                                            (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) (cons (reverse (cons "tipo1" (reverse (cons (first (first listaPreguntas2)) (list (selection combo)))))) listaRespuestas) contador)
                                                                 pack!
                                                                 show!))))])
       :on-close :exit)))
-(defn preguntaTipo2Frame [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems]
+(defn preguntaTipo2Frame [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems listaRespuestasItems]
   (let [input  (text :columns 20)
         combo (combobox :model ["Muy bien" "Bien" "Regular" "Malo" "Muy malo"])]
     (frame 
@@ -140,19 +137,19 @@
                 combo
                 (action :name "Siguiente"
                   :handler (fn [e] (dispose! (all-frames)) (invoke-later
-                                                             (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador (rest listaItems))
+                                                             (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador (rest listaItems) (cons (cons (first listaItems) (list (selection combo))) listaRespuestasItems))
                                                                  pack!
                                                                  show!))))])
       :on-close :exit)))
 
-(defn preguntaTipo2 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems]
+(defn preguntaTipo2 [listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems listaRespuestasItems]
   (cond
     (not(empty? listaItems)) (invoke-later
-                               (-> (preguntaTipo2Frame listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems)
+                               (-> (preguntaTipo2Frame listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador listaItems listaRespuestasItems)
                                    pack!
                                    show!)) 
     (empty? listaItems) (invoke-later
-                          (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) listaRespuestas contador)
+                          (-> (validacionTipo listaEncuestas listaPreguntas1 (rest listaPreguntas2) (cons (reverse (cons "tipo2" (reverse(cons (first (first listaPreguntas2)) (list listaRespuestasItems))))) listaRespuestas) contador)
                               pack!
                               show!))))
 
@@ -192,7 +189,7 @@
                                                                                                       pack!
                                                                                                       show!))
                                     (= (str (first (reverse (first listaPreguntas2)))) "tipo2") (invoke-later
-                                                                                                  (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador (first(rest (first listaPreguntas2)))) ;lista 2 es la que va a cambiar
+                                                                                                  (-> (preguntaTipo2 listaEncuestas listaPreguntas1 listaPreguntas2 listaRespuestas contador (first(rest (first listaPreguntas2))) '()) ;lista 2 es la que va a cambiar
                                                                                                       pack!
                                                                                                       show!)))
     (empty? listaPreguntas2) (invoke-later
@@ -202,11 +199,7 @@
     
     
     ;se necesita que la preguntaTipo# llame con rest
-    
-    
-    
-    
-  
+
 (defn estadistica [listaEncuestas listaRespuestas]
   (let [input  (text :columns 20)]
     (frame 
@@ -273,10 +266,9 @@
                     ;                                             show!))))])
       :on-close :exit)))
 
-
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo2") ("pregunta2" ("si" "no") "tipo2") ("pregunta3" ("si" "no" "tal vez") "tipo2"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
+    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo2") ("pregunta2" ("si" "no") "tipo1") ("pregunta3" ("si" "no" "tal vez") "tipo1"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
      pack!
      show!)))
