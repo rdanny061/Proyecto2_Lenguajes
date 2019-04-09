@@ -337,6 +337,6 @@
 (defn -main [& args]
   
   (invoke-later
-    (-> (mainForm '(("enc3" (("pregunta1" ("si" "no") "tipo2") ("pregunta2" ("si" "no") "tipo1") ("pregunta3" ("si" "no" "tal vez") "tipo1"))) ("enc2" (("pregunta2" ("si" "no") "tipo1"))) ("enc1" ("y yo"))))
+    (-> (mainForm '(("Encuesta1" (("Conoce usted Costa Rica?" ("Si" "No") "tipo1") ("Sobre Costa Rica..." ("Que tan bueno es el turismo?" "Que tan bueno es el gallo pinto?") "tipo2") ("Votaria nuevamente por el actual presidente de Costa Rica?" ("Si" "No" "Tal Vez") "tipo1"))) ("Encuesta2" (("Le gusta a usted jugar video juegos?" ("si" "no") "tipo1") ("Sobre los video juegos" ("Que le parecen los juegos de deportes?" "Que te parecen los juegos de carros?" "Que te parecen los juegos aventura?") "tipo2"))) ("Encuesta3" (("Califique las siguientes universidades" ("TEC" "UCR" "UNA" "UNED" "UTN" "ULatina" "U Fidelitas") "tipo2") ("Cree usted que existe diferencia en la capacidad de los estudiantes de universidades publicas y privadas?" ("Si" "No" "Tal vez") "tipo1")))))
      pack!
      show!)))
