@@ -259,14 +259,24 @@
 
 (defn estadistica [listaEncuestas listaRespuestas]
   (let [input  (text :columns 20)]
-    (frame 
+    (frame
+      :title "Estadisticas Encuesta"
       :content 
       (vertical-panel 
-        :border 5
-        :items ["Digite el cuerpo de la pregunta:"
+        :border 150
+        :items [
+                "Estadisticas"
+                
+                (action :name "Imprimir Lista Respuestas"
+                 :handler (fn [e] (println listaRespuestas)))
                 
                 (action :name "Volver"
-                 :handler (fn [e] (println listaRespuestas)))])
+                  :handler (fn [e] (dispose! (all-frames)) (invoke-later
+                                                             (-> (mainForm listaEncuestas)
+                                                                 pack!
+                                                                 show!))))])
+                
+                
       :on-close :exit)))
 
 (defn tipoPregunta [nombreEncuesta listaEncuestas listaPreguntas]
